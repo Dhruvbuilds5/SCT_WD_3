@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="app">
+    <h1>Tic Tac Toe</h1>
+
+    <!-- Mode and difficulty -->
+    <div class="seg" id="modeSeg">
+      <button class="seg-btn" data-mode="pvp">2 Players</button>
+      <button class="seg-btn active" data-mode="cpu">vs Computer</button>
+    </div>
+
+    <div class="seg" id="diffSeg">
+      <button class="seg-btn" data-diff="easy">Easy</button>
+      <button class="seg-btn" data-diff="medium">Medium</button>
+      <button class="seg-btn active" data-diff="hard">Hard</button>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scores">
+      <div class="score" id="cardX">
+        <span class="label" id="labelX">You (X)</span>
+        <span class="num" id="scoreX">0</span>
+      </div>
+      <div class="score" id="cardD">
+        <span class="label">Draws</span>
+        <span class="num" id="scoreD">0</span>
+      </div>
+      <div class="score" id="cardO">
+        <span class="label" id="labelO">Computer (O)</span>
+        <span class="num" id="scoreO">0</span>
+      </div>
+    </div>
+
+    <!-- Status message -->
+    <p class="status" id="status" aria-live="polite">Your turn</p>
+
+    <!-- Board -->
+    <div class="board" id="board">
+      <button class="cell" aria-label="Row 1, column 1, empty"></button>
+      <button class="cell" aria-label="Row 1, column 2, empty"></button>
+      <button class="cell" aria-label="Row 1, column 3, empty"></button>
+      <button class="cell" aria-label="Row 2, column 1, empty"></button>
+      <button class="cell" aria-label="Row 2, column 2, empty"></button>
+      <button class="cell" aria-label="Row 2, column 3, empty"></button>
+      <button class="cell" aria-label="Row 3, column 1, empty"></button>
+      <button class="cell" aria-label="Row 3, column 2, empty"></button>
+      <button class="cell" aria-label="Row 3, column 3, empty"></button>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="restartBtn">New round</button>
+      <button class="btn ghost" id="resetBtn">Reset scores</button>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

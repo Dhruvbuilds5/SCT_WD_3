@@ -1,0 +1,369 @@
+:root {
+  --bg: #e8e3ff;
+  --surface: #f3f0ff;
+  --ink: #4a4468;
+  --muted: #8f89ab;
+  --x: #ff6f91;
+  --o: #3db4e8;
+  --light: rgba(255, 255, 255, 0.85);
+  --dark: rgba(120, 105, 180, 0.28);
+  --drop: rgba(120, 105, 180, 0.35);
+
+  /* Reusable clay shadows */
+  --raised:
+    10px 10px 24px var(--drop),
+    -6px -6px 16px rgba(255, 255, 255, 0.8),
+    inset -6px -6px 12px var(--dark),
+    inset 6px 6px 12px var(--light);
+  --raised-small:
+    5px 5px 12px var(--drop),
+    -3px -3px 8px rgba(255, 255, 255, 0.8),
+    inset -3px -3px 6px var(--dark),
+    inset 3px 3px 6px var(--light);
+  --pressed:
+    inset 6px 6px 12px var(--dark),
+    inset -6px -6px 12px rgba(255, 255, 255, 0.9);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  font-family: 'Nunito', -apple-system, sans-serif;
+  background: linear-gradient(160deg, #efe9ff, #dfe9ff 55%, #ffe5ee);
+  color: var(--ink);
+}
+
+/* Soft clay blobs in the background */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  z-index: -1;
+  box-shadow: var(--raised);
+}
+body::before {
+  width: 220px; height: 220px;
+  top: -60px; right: -50px;
+  background: #ffd6e0;
+}
+body::after {
+  width: 260px; height: 260px;
+  bottom: -90px; left: -70px;
+  background: #cfe8ff;
+}
+
+.app {
+  width: min(92vw, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+}
+
+/* ---------- Segmented controls ---------- */
+.seg {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--surface);
+  border-radius: 22px;
+  box-shadow: var(--pressed);
+}
+
+.seg.hidden {
+  display: none;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 11px 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.seg-btn:hover {
+  color: var(--ink);
+}
+
+.seg-btn.active {
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: var(--raised-small);
+}
+
+/* ---------- Scoreboard ---------- */
+.scores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.score {
+  position: relative;
+  padding: 14px 8px 18px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: var(--raised-small);
+}
+
+.score .label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.score .num {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+/* Colored bar shows whose turn it is */
+.score::after {
+  content: '';
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 8px;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+#cardX.turn::after { background: var(--x); transform: scaleX(1); }
+#cardO.turn::after { background: var(--o); transform: scaleX(1); }
+
+/* ---------- Status ---------- */
+.status {
+  min-height: 28px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.status.pop {
+  animation: pop 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.status[data-state="thinking"] {
+  color: var(--muted);
+  animation: breathe 1.2s ease-in-out infinite;
+}
+
+.status[data-state="x"]    { color: var(--x); }
+.status[data-state="o"]    { color: var(--o); }
+.status[data-state="draw"] { color: var(--muted); }
+
+@keyframes pop {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes breathe {
+  50% { opacity: 0.4; }
+}
+
+/* ---------- Board ---------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 36px;
+  box-shadow: var(--pressed);
+}
+
+.cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: none;
+  border-radius: 28px;
+  box-shadow: var(--raised);
+  cursor: default;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.4s ease;
+}
+
+/* A filled cell looks pressed into the clay */
+.cell:not(:empty) {
+  box-shadow: var(--pressed);
+}
+
+/* Faint preview of the mark on hover */
+.cell::before {
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.35;
+}
+
+.board:not([data-turn=""]) .cell:empty {
+  cursor: pointer;
+}
+
+.board:not([data-turn=""]) .cell:empty:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+.board:not([data-turn=""]) .cell:empty:active {
+  transform: scale(0.96);
+  box-shadow: var(--pressed);
+}
+
+.board[data-turn="X"] .cell:empty:hover::before { content: '×'; color: var(--x); }
+.board[data-turn="O"] .cell:empty:hover::before { content: '○'; color: var(--o); }
+
+/* ---------- Clay X and O ---------- */
+.mark {
+  position: relative;
+  display: block;
+  width: 44%;
+  aspect-ratio: 1;
+}
+
+.mark.x::before,
+.mark.x::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140%;
+  height: 15px;
+  border-radius: 99px;
+  background: var(--x);
+  box-shadow:
+    3px 5px 8px rgba(255, 111, 145, 0.45),
+    inset -3px -3px 6px rgba(0, 0, 0, 0.15),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%) rotate(var(--r)) scaleX(0);
+  animation: drawX 0.3s ease forwards;
+}
+
+.mark.x::before { --r: 45deg; }
+.mark.x::after  { --r: -45deg; animation-delay: 0.12s; }
+
+@keyframes drawX {
+  from { transform: translate(-50%, -50%) rotate(var(--r)) scaleX(0); }
+  to   { transform: translate(-50%, -50%) rotate(var(--r)) scaleX(1); }
+}
+
+.mark.o {
+  width: 52%;
+  border: 14px solid var(--o);
+  border-radius: 50%;
+  box-shadow:
+    3px 6px 10px rgba(61, 180, 232, 0.45),
+    inset 3px 5px 8px rgba(0, 0, 0, 0.2);
+  animation: popO 0.4s cubic-bezier(0.3, 1.7, 0.5, 1) both;
+}
+
+@keyframes popO {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- Win and draw feedback ---------- */
+.cell.win {
+  animation: winPop 0.55s ease;
+}
+
+.cell.win-x {
+  box-shadow: var(--pressed), 0 0 0 4px var(--x);
+}
+
+.cell.win-o {
+  box-shadow: var(--pressed), 0 0 0 4px var(--o);
+}
+
+@keyframes winPop {
+  40% { transform: scale(1.1); }
+}
+
+.board.over .cell:not(.win) {
+  opacity: 0.4;
+}
+
+.board.draw .cell {
+  opacity: 0.65;
+}
+
+/* ---------- Buttons ---------- */
+.actions {
+  display: flex;
+  gap: 14px;
+}
+
+.btn {
+  flex: 1;
+  padding: 15px 0;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.primary {
+  color: #fff;
+  background: linear-gradient(145deg, #ff8fa9, #ff6f91);
+  box-shadow:
+    8px 8px 18px rgba(255, 111, 145, 0.4),
+    -4px -4px 12px rgba(255, 255, 255, 0.8),
+    inset -4px -4px 8px rgba(0, 0, 0, 0.12),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.45);
+}
+
+.btn.ghost {
+  color: var(--muted);
+  background: var(--surface);
+  box-shadow: var(--raised-small);
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 360px) {
+  .cell::before { font-size: 40px; }
+  .mark.o { border-width: 10px; }
+  .mark.x::before,
+  .mark.x::after { height: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
